@@ -69,3 +69,11 @@ install: build
 	install -D --mode 0600 --target-directory ${DESTDIR}/etc/conf.d ${EXECUTABLE}
 
 	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/share/licenses/LICENSE LICENSE
+
+.PHONY: uninstall
+uninstall:
+	-rm --recursive --force \
+		${DESTDIR}${PREFIX}/bin/${EXECUTABLE} \
+		${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service \
+		${DESTDIR}/etc/conf.d/${EXECUTABLE} \
+		${DESTDIR}${PREFIX}/share/licenses/${EXECUTABLE}/LICENSE

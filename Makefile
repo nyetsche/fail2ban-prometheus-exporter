@@ -1,3 +1,7 @@
+DESTDIR?=
+PREFIX?=/usr/local
+EXECUTABLE?=fail2ban_exporter
+
 # List make commands
 .PHONY: ls
 ls:
@@ -47,10 +51,21 @@ build:
 	-X main.builtBy=manual \
 	" \
 	-trimpath \
-	-o fail2ban_exporter \
+	-o ${EXECUTABLE} \
 	exporter.go
 
 # Build project docker container
 .PHONY: build/docker
 build/docker: build
-	docker build -t fail2ban-prometheus-exporter .
+	docker build -t ${EXECUTABLE} .
+
+.PHONY: install
+install: build
+	install -D --mode 0644 systemd/systemd.service ${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service
+
+	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/bin/${EXECUTABLE} ${EXECUTABLE}
+
+# NOTE: Set restrict file permissions by default to protect optional basic auth credentials
+	install -D --mode 0600 --target-directory ${DESTDIR}/etc/conf.d ${EXECUTABLE}
+
+	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/share/licenses/LICENSE LICENSE

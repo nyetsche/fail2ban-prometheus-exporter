@@ -46,6 +46,7 @@ build:
 	-X main.date=${shell date --iso-8601=seconds} \
 	-X main.builtBy=manual \
 	" \
+	-trimpath \
 	-o fail2ban_exporter \
 	exporter.go
 

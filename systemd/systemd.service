@@ -4,8 +4,8 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-EnvironmentFile=/etc/conf.d/prometheus-fail2ban-exporter
-ExecStart=/usr/bin/prometheus-fail2ban-exporter
+EnvironmentFile=/etc/conf.d/EXECUTABLE
+ExecStart=/usr/bin/EXECUTABLE
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=5s

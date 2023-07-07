@@ -2,6 +2,8 @@ DESTDIR?=
 PREFIX?=/usr/local
 EXECUTABLE?=fail2ban_exporter
 
+CONTAINER_RUNTIME?=$(shell which docker)
+
 # List make commands
 .PHONY: ls
 ls:
@@ -54,21 +56,25 @@ build:
 	-o ${EXECUTABLE} \
 	exporter.go
 
-# Build project docker container
-.PHONY: build/docker
-build/docker: build
-	docker build -t ${EXECUTABLE} .
+# build container-image
+.PHONY: build/container-image
+build/container-image:
+	${CONTAINER_RUNTIME} build \
+		--tag ${EXECUTABLE} \
+		.
 
 .PHONY: install
 install: build
-	install -D --mode 0644 systemd/systemd.service ${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service
+	mkdir --parents ${DESTDIR}/usr/lib/systemd/system
+	sed -e "s/EXECUTABLE/${EXECUTABLE}/gm" systemd/systemd.service > ${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service
+	chmod 0644 ${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service
 
-	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/bin/${EXECUTABLE} ${EXECUTABLE}
+	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/bin ${EXECUTABLE}
 
 # NOTE: Set restrict file permissions by default to protect optional basic auth credentials
-	install -D --mode 0600 --target-directory ${DESTDIR}/etc/conf.d ${EXECUTABLE}
+	install -D --mode 0600 env ${DESTDIR}/etc/conf.d/${EXECUTABLE}
 
-	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/share/licenses/LICENSE LICENSE
+	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/share/licenses/${EXECUTABLE} LICENSE
 
 .PHONY: uninstall
 uninstall:

@@ -1,0 +1,22 @@
+[Unit]
+Description=Prometheus exporter for fail2ban metrics
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+EnvironmentFile=/etc/conf.d/EXECUTABLE
+ExecStart=/usr/bin/EXECUTABLE
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+
+NoNewPrivileges=true
+
+# NOTE: Would be great to create and use a dedicated user/group via
+# sysusers.conf to access the fail2ban socket, but currently it is no possible
+# without manual configuration of the fail2ban daemon.
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

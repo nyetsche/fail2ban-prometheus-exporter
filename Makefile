@@ -1,3 +1,9 @@
+DESTDIR?=
+PREFIX?=/usr/local
+EXECUTABLE?=fail2ban_exporter
+
+CONTAINER_RUNTIME?=$(shell which docker)
+
 # List make commands
 .PHONY: ls
 ls:
@@ -46,10 +52,34 @@ build:
 	-X main.date=${shell date --iso-8601=seconds} \
 	-X main.builtBy=manual \
 	" \
-	-o fail2ban_exporter \
+	-trimpath \
+	-o ${EXECUTABLE} \
 	exporter.go
 
-# Build project docker container
-.PHONY: build/docker
-build/docker: build
-	docker build -t fail2ban-prometheus-exporter .
+# build container-image
+.PHONY: build/container-image
+build/container-image:
+	${CONTAINER_RUNTIME} build \
+		--tag ${EXECUTABLE} \
+		.
+
+.PHONY: install
+install: build
+	mkdir --parents ${DESTDIR}/usr/lib/systemd/system
+	sed -e "s/EXECUTABLE/${EXECUTABLE}/gm" systemd/systemd.service > ${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service
+	chmod 0644 ${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service
+
+	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/bin ${EXECUTABLE}
+
+# NOTE: Set restrict file permissions by default to protect optional basic auth credentials
+	install -D --mode 0600 env ${DESTDIR}/etc/conf.d/${EXECUTABLE}
+
+	install -D --mode 0755 --target-directory ${DESTDIR}${PREFIX}/share/licenses/${EXECUTABLE} LICENSE
+
+.PHONY: uninstall
+uninstall:
+	-rm --recursive --force \
+		${DESTDIR}${PREFIX}/bin/${EXECUTABLE} \
+		${DESTDIR}/usr/lib/systemd/system/${EXECUTABLE}.service \
+		${DESTDIR}/etc/conf.d/${EXECUTABLE} \
+		${DESTDIR}${PREFIX}/share/licenses/${EXECUTABLE}/LICENSE

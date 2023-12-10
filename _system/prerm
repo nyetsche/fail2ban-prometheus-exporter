@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+if [ -z "${DPKG_ROOT:-}" ] && [ "$1" = remove ] && [ -d /run/systemd/system ] ; then
+	deb-systemd-invoke stop 'prometheus-fail2ban-exporter.service' >/dev/null || true
+fi
+
+if [ -z "${DPKG_ROOT:-}" ] && [ "$1" = remove ] && [ -x "/etc/init.d/prometheus-fail2ban-exporter" ] ; then
+	invoke-rc.d --skip-systemd-native prometheus-fail2ban-exporter stop || exit 1
+fi
+

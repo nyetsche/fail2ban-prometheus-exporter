@@ -1,19 +1,20 @@
 [Unit]
-Description=Fail2ban metric exporter for Prometheus
+Description=Fail2Ban Exporter
 Documentation=https://gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/-/blob/main/README.md
-Requires=network-online.target
-After=network-online.target
+After=network-online.target fail2ban.service
+Requires=network-online.target fail2ban.service
 
 [Service]
-ExecStart=/usr/sbin/fail2ban_exporter
 Restart=on-failure
-RestartSec=5s
-NoNewPrivileges=true
 
 # Currently need to run the exporter as root to ensure it has read/write access to the
 # fail2ban socket file.
 User=root
 Group=root
+
+EnvironmentFile=/etc/default/prometheus-fail2ban-exporter
+StandardOutput=journal+console
+ExecStart=/usr/bin/prometheus-fail2ban-exporter $ARGS
 
 [Install]
 WantedBy=multi-user.target

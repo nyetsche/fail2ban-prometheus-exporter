@@ -1,0 +1,31 @@
+#!/bin/sh
+# postrm script for prometheus-fail2ban-exporter
+# Script executed after the package is removed.
+
+set -e
+
+case "$1" in
+  purge)
+    rm -rf /var/log/prometheus/prometheus-fail2ban-exporter.log* \
+           /run/prometheus/prometheus-fail2ban-exporter.pid
+    # We do NOT remove the system user.
+    ;;
+esac
+
+if [ "$1" = "remove" ] && [ -x "/etc/init.d/prometheus-fail2ban-exporter" ] ; then
+	chmod -x "/etc/init.d/prometheus-fail2ban-exporter" >/dev/null || true
+fi
+if [ -z "${DPKG_ROOT:-}" ] && [ "$1" = "purge" ] ; then
+	update-rc.d prometheus-fail2ban-exporter remove >/dev/null
+fi
+
+if [ "$1" = remove ] && [ -d /run/systemd/system ] ; then
+	systemctl --system daemon-reload >/dev/null || true
+fi
+
+if [ "$1" = "purge" ]; then
+	if [ -x "/usr/bin/deb-systemd-helper" ]; then
+		deb-systemd-helper purge 'prometheus-fail2ban-exporter.service' >/dev/null || true
+	fi
+fi
+

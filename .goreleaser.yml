@@ -14,6 +14,19 @@ builds:
       - "6"
       - "7"
 
+archives:
+- id: man-pages
+  builds:
+    - default
+  format: gz
+  meta: true
+  name_template: prometheus-fail2ban-exporter.1
+  strip_parent_binary_folder: true
+  wrap_in_directory: false
+  files: 
+    - _system/man
+
+
 dockers:
 - image_templates:
   - "registry.gitlab.com/hectorjsmith/fail2ban-prometheus-exporter:{{ .Major }}-amd64"
@@ -77,6 +90,57 @@ docker_manifests:
   image_templates:
   - 'registry.gitlab.com/hectorjsmith/fail2ban-prometheus-exporter:latest-amd64'
   - 'registry.gitlab.com/hectorjsmith/fail2ban-prometheus-exporter:latest-arm64'
+
+nfpms:
+- id: prometheus-fail2ban-exporter
+  
+  package_name: prometheus-fail2ban-exporter
+  
+  vendor: hectorjsmith
+  
+  homepage: https://gitlab.com/hectorjsmith/fail2ban-prometheus-exporter
+  
+  maintainer: hectorjsmith <[email protected]>
+  
+  description: |-
+    Collect metrics from a running fail2ban instance.
+  
+  license: MIT License
+  
+  formats:
+#    - apk
+    - deb
+#    - rpm
+#    - termux.deb # Since: v1.11
+#    - archlinux # Since: v1.13
+
+  section: net
+
+  meta: true
+
+  dependencies:
+    - adduser
+
+  contents:
+    - src: "{{ .ArtifactPath }}"
+      dst: /usr/bin/prometheus-fail2ban-exporter
+    - src: README.md
+      dst: /usr/share/doc/prometheus-fail2ban-exporter/README.md
+    - src: LICENSE
+      dst: /usr/share/doc/prometheus-fail2ban-exporter/copyright
+    - src: _system/default
+      dst: /etc/default/prometheus-fail2ban-exporter
+    - src: _system/init
+      dst: /etc/init.d/prometheus-fail2ban-exporter
+    - src: _system/systemd/prometheus-fail2ban-exporter.service
+      dst: /lib/systemd/system/prometheus-fail2ban-exporter.service
+    - src: dist/prometheus-fail2ban-exporter.1.gz
+      dst: /usr/share/man/man1/prometheus-fail2ban-exporter.1.gz
+
+  scripts:
+    postinstall: "_system/postinst"
+    preremove: "_system/prerm"
+    postremove: "_system/postrm"
 
 changelog:
   groups:

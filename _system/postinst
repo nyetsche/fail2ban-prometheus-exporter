@@ -1,0 +1,62 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+  configure)
+    # Add prometheus user
+    adduser --quiet --system --home /var/lib/prometheus --no-create-home \
+            --group --gecos "Prometheus daemon" prometheus
+  ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    :
+  ;;
+
+  *)
+    echo "postinst called with unknown argument '$1'" >&2
+    exit 1
+  ;;
+esac
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -z "${DPKG_ROOT:-}" ] && [ -x "/etc/init.d/prometheus-fail2ban-exporter" ]; then
+		update-rc.d prometheus-fail2ban-exporter defaults >/dev/null
+		if [ -n "$2" ]; then
+			_dh_action=restart
+		else
+			_dh_action=start
+		fi
+		invoke-rc.d --skip-systemd-native prometheus-fail2ban-exporter $_dh_action || exit 1
+	fi
+fi
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# The following line should be removed in trixie or trixie+1
+	deb-systemd-helper unmask 'prometheus-fail2ban-exporter.service' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'prometheus-fail2ban-exporter.service'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'prometheus-fail2ban-exporter.service' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'prometheus-fail2ban-exporter.service' >/dev/null || true
+	fi
+fi
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -d /run/systemd/system ]; then
+		systemctl --system daemon-reload >/dev/null || true
+		if [ -n "$2" ]; then
+			_dh_action=restart
+		else
+			_dh_action=start
+		fi
+		deb-systemd-invoke $_dh_action 'prometheus-fail2ban-exporter.service' >/dev/null || true
+	fi
+fi
+
+exit 0

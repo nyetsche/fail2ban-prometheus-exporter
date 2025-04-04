@@ -1,9 +1,10 @@
 package f2b
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/socket"
 	"log"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/socket"
 )
 
 const (

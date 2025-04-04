@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+
 	"github.com/nlpodyssey/gopickle/pickle"
 )
 
@@ -62,7 +63,7 @@ func (s *Fail2BanSocket) read() (interface{}, error) {
 		if (module == "builtins" || module == "__builtin__") && name == "str" {
 			return &Py_builtins_str{}, nil
 		}
-		return nil, fmt.Errorf("class not found: " + module + " : " + name)
+		return nil, fmt.Errorf("class not found: [%s] %s", module, name)
 	}
 
 	return unpickler.Load()

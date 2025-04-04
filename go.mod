@@ -1,6 +1,6 @@
 module gitlab.com/hctrdev/fail2ban-prometheus-exporter
 
-go 1.20
+go 1.24
 
 require (
 	github.com/alecthomas/kong v0.8.1

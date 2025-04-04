@@ -1,4 +1,4 @@
-module gitlab.com/hectorjsmith/fail2ban-prometheus-exporter
+module gitlab.com/hctrdev/fail2ban-prometheus-exporter
 
 go 1.20
 

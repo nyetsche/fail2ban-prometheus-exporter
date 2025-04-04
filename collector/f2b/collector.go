@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/cfg"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/socket"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/cfg"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/socket"
 )
 
 type Collector struct {

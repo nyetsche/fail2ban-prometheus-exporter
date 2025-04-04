@@ -1,6 +1,6 @@
 package cfg
 
-import "gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/auth"
+import "gitlab.com/hctrdev/fail2ban-prometheus-exporter/auth"
 
 type AppSettings struct {
 	VersionMode           bool

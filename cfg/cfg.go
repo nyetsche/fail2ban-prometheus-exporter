@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/auth"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/auth"
 )
 
 var cliStruct struct {

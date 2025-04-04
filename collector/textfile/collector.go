@@ -1,9 +1,10 @@
 package textfile
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/cfg"
 	"log"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/cfg"
 )
 
 type Collector struct {

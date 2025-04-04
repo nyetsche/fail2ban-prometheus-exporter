@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/cfg"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/collector/f2b"
-	"gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/collector/textfile"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/cfg"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/collector/f2b"
+	"gitlab.com/hctrdev/fail2ban-prometheus-exporter/collector/textfile"
 )
 
 func StartServer(

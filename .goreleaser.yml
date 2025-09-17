@@ -1,97 +1,28 @@
 project_name: fail2ban_exporter
+
+before:
+  hooks:
+    - go mod tidy
+
 builds:
-  - env: [CGO_ENABLED=0]
+  - id: fail2ban_exporter
     binary: fail2ban_exporter
-    goos:
-      - linux
-      - darwin
-    goarch:
-      - amd64
-      - "386"
-      - arm
-      - arm64
-    goarm:
-      - "6"
-      - "7"
+    env:
+      - CGO_ENABLED=0
+    goos: [linux]
+    goarch: [amd64, arm64]
 
-dockers:
-- image_templates:
-  - "registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}-amd64"
-  - "registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}.{{ .Minor }}-amd64"
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Version }}-amd64'
-  - "registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest-amd64"
-  extra_files:
-  - health
-  use: buildx
-  dockerfile: Dockerfile.goreleaser
-  build_flag_templates:
-  - "--pull"
-  - "--platform=linux/amd64"
-  - --label=org.opencontainers.image.title={{ .ProjectName }}
-  - --label=org.opencontainers.image.description={{ .ProjectName }}
-  - --label=org.opencontainers.image.url=https://gitlab.com/hctrdev/fail2ban-prometheus-exporter
-  - --label=org.opencontainers.image.source=https://gitlab.com/hctrdev/fail2ban-prometheus-exporter
-  - --label=org.opencontainers.image.version={{ .Version }}
-  - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
-  - --label=org.opencontainers.image.revision={{ .FullCommit }}
-  - --label=org.opencontainers.image.licenses=MIT
-- image_templates:
-  - "registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}-arm64"
-  - "registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}.{{ .Minor }}-arm64"
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Version }}-arm64'
-  - "registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest-arm64"
-  extra_files:
-  - health
-  use: buildx
-  dockerfile: Dockerfile.goreleaser
-  build_flag_templates:
-  - "--pull"
-  - "--platform=linux/arm64"
-  - --label=org.opencontainers.image.title={{ .ProjectName }}
-  - --label=org.opencontainers.image.description={{ .ProjectName }}
-  - --label=org.opencontainers.image.url=https://gitlab.com/hctrdev/fail2ban-prometheus-exporter
-  - --label=org.opencontainers.image.source=https://gitlab.com/hctrdev/fail2ban-prometheus-exporter
-  - --label=org.opencontainers.image.version={{ .Version }}
-  - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
-  - --label=org.opencontainers.image.revision={{ .FullCommit }}
-  - --label=org.opencontainers.image.licenses=MIT
-  goarch: arm64
-
-docker_manifests:
-- name_template: 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}'
-  image_templates:
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}-amd64'
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}-arm64'
-
-- name_template: 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}.{{ .Minor }}'
-  image_templates:
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}.{{ .Minor }}-amd64'
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Major }}.{{ .Minor }}-arm64'
-
-- name_template: 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Version }}'
-  image_templates:
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Version }}-amd64'
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:{{ .Version }}-arm64'
-
-- name_template: 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest'
-  image_templates:
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest-amd64'
-  - 'registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest-arm64'
+archives:
+  - id: binary
+    formats: [ binary ]
 
 changelog:
-  groups:
-    - title: "⛔ Breaking Changes"
-      regexp: '^.*?!:.+$'
-      order: 0
-    - title: "🎉 Features"
-      regexp: '^.*?feat(\(\w+\))??:.+$'
-      order: 1
-    - title: "🐛 Fixes"
-      regexp: '^.*?fix(\(\w+\))??:.+$'
-      order: 2
-    - title: "📑 Other"
-      order: 999
-  filters:
-    exclude:
-      - "^Merge"
-      - "^merge"
+  use: git
+
+release:
+  draft: false
+  prerelease: auto
+  # You can omit the repo info; GoReleaser infers from git remote.
+  # github:
+  #   owner: <your-gh-user-or-org>
+  #   name: <your-repo-name>
